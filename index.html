@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Menu</title>
+	<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.2.0.min.js"></script>
+	<script src="https://unpkg.com/react@15.3.2/dist/react.js"></script>
+	<script src="https://unpkg.com/react-dom@15.3.2/dist/react-dom.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
+</head>
+<body>
+<div id="log">
+</div>
+	<div class="content">
+		<div id="Menu">
+			<div class="menu_options" id="MenuInner">
+				<div class="table_item">
+					<label class="label" id="option_1">Option 1</label>
+				</div>			
+				<div class="table_item">
+					<label class="label" id="option_1">Option 2</label>
+				</div>			
+				<div class="table_item">
+					<label class="label" id="option_1">Option 3</label>
+				</div>			
+				<div class="table_item">
+					<label class="label" id="option_1">Option 4</label>
+				</div>
+			
+				<div class="menu_hover opacity_zero " id="MenuHover">
+					<div class="table_hover" id="HoverBox">
+						
+					</div>
+				</div>	
+			</div>
+		</div>
+	</div>
+	<div class="content2" id="content2">
+	</div>
+</div>
+</body>
+
+
+<script type="text/babel">
+	class ReactListItem extends React.Component {
+      	render() {
+      		const classes = (this.props.selected) ? "selected_item animate" : "table_item animate";
+      		return (
+      			<div className={classes}>
+					<label className="label" id={this.props.id} >{this.props.option}</label>
+				</div>	
+      		);
+      	}
+    }
+    class ReactListHoverBox extends React.Component {
+      	render() {
+       		return (
+      			<div className="menu_hover animate table_hover" style={this.props.theStyle}>
+				</div>	
+      		);
+      	}
+    }
+
+    var names = ["Niklas", "Porscho", "Hank", "Bread", "Bool","Yuri","Morty"];
+
+
+	class ReactList extends React.Component{
+
+		constructor(props) {
+			super(props);
+		    this.state =  {
+		    	opacity: 0,
+		    	currentHeight:  0,
+		    	disp: false,
+		    	selected:-1
+		    };
+		}
+		setHeight(e) {
+			var parentOffset = $(ReactDOM.findDOMNode(this)).parent().offset(); 
+			var relY = e.pageY - parentOffset.top;
+			var num = Math.floor( relY /40 ) ;
+			num = (num <  0) ? 0 :num;
+			var numHeight = num * 40;
+			if (this.state.currentHeight != numHeight) {
+				this.setState ({
+					current: num,
+			    	currentHeight: numHeight
+			    });
+			}
+		}
+		mouseMoveEventHandler(e) { 
+			this.setHeight(e);
+			this.setState({
+				disp: true
+			});
+		}
+		mouseEnterEventHandler(e) {
+			this.setHeight(e);
+			this.setState({
+				opacity: 0,
+				disp: false
+			});
+		}
+		mouseExitEventHandler() {
+			this.setState({
+				opacity: 1
+			});		
+		}
+		mouseClickEventHandler() {
+			this.setState({
+				selected: this.state.current
+			});	
+		}
+		componentDidUpdate(){
+		}
+		componentWillUpdate(nextProps, nextState) {
+		}
+		shouldComponentUpdate(nextProps, nextState) {
+			return true;
+		}
+      	render() {
+      		const hoverStyle = {
+      			top : this.state.currentHeight
+      		}
+      		const screenStyle = {
+      			opacity : this.state.opacity
+      		}
+
+      		var listCount = 0;
+      		var outsideThis = this;
+			var listItems = names.map(function(name) {
+				const isSelected = (outsideThis.state.selected == listCount) ? true : false;
+				listCount = 1 + listCount;
+      			return <ReactListItem key={name.toString()} id={name.toString()} option={name} selected={isSelected}/>;
+			}
+    		);
+    		var hoverBox;
+    		if (this.state.disp) {
+    			hoverBox= <ReactListHoverBox theStyle={hoverStyle}/>;
+    		} else {
+    			hoverBox= <div></div>;
+    		}
+          	return (
+	            <div id="Menu2" onMouseMove={this.mouseMoveEventHandler.bind(this)} onMouseEnter={this.mouseEnterEventHandler.bind(this)} onMouseLeave={this.mouseExitEventHandler.bind(this)} onClick={this.mouseClickEventHandler.bind(this)}>
+	              	<div className="menu_options">
+	              		<div className="menu_screen animate" style={screenStyle}></div>
+	              		{listItems}
+	              		<div>
+	              			{hoverBox}
+	              		</div>
+	              	</div>
+	            </div>
+        	);
+
+      	}
+  	}
+
+	var destination = document.querySelector("#content2");
+
+	ReactDOM.render(
+		<div className="container">
+		    <ReactList/>
+		</div>
+	, destination);
+</script>
+
+
+
+<script type="text/javascript">
+	
+	var moveDirect = false;
+	$("#MenuInner").mouseenter(function(){
+		moveDirect = true;
+	}).mouseleave(function(){
+		$("#MenuHover").addClass("opacity_zero");
+		wl("here");
+	});
+
+	$( "#MenuInner" ).mousemove(function( e ) {
+		var parentOffset = $(this).parent().offset(); 
+		var relY = e.pageY - parentOffset.top;
+		var num = Math.floor( relY /40 ) ;
+		if(moveDirect) {
+			$("#MenuHover").removeClass("animate");
+		}	
+		$("#MenuHover").css("top", (num * 40) + "px");
+		
+		if(moveDirect){
+			$("#MenuHover")[0].offsetHeight;
+			$("#MenuHover").addClass("animate");
+			$("#MenuHover").removeClass("opacity_zero");
+			moveDirect = false;
+		}
+	});
+
+	$(".menu_options").click(function(){
+		wl("click");
+	});
+
+
+function wl(text) {
+	$("#log").append(text);
+	$("#log").append("<br>");
+	$('#log').scrollTop($('#log')[0].scrollHeight);
+}
+
+
+</script>
+ 
+
+
+
+<style type="text/css">
+	
+.content {
+	left: 40%;
+	position: relative;
+	top: 20%;
+	height: 70%;
+	width:40%;
+	background-color: pink;
+
+
+}
+.content2 {
+	left: 40%;
+	position: relative;
+	height: 70%;
+	width:40%;
+	background-color: lightblue;
+
+
+}
+#log {
+	position: absolute;
+	overflow-y: auto;
+	height: 500px;
+	width: 300px;
+	background-color: lightgrey;
+}
+.menu_options {
+	position: absolute;
+	width: inherit;
+	display: table-row;
+	cursor: pointer;
+	overflow: hidden;
+	background-color: rgba(230,230,230,.5);
+	z-index: 40;
+}
+.opacity_zero {
+	opacity: 0;
+}
+.menu_hover {
+	position: absolute;
+	width: inherit;
+	cursor: pointer;
+	pointer-events: none;
+	top:0;
+	z-index: 45;
+}
+.menu_screen {
+	background-color: rgb(230,230,230);
+	z-index: 47;
+	height: 100%;
+	width: 100%;
+	position: absolute;
+}
+.animate {
+	-webkit-transition: all .3s linear;
+    -moz-transition: all .3s linear;
+    -o-transition: all .3s linear;
+    -ms-transition: all .3s linear;
+	transition: all .3s linear;
+}
+
+#HoverBox {
+
+}
+
+#Menu {
+	width: 300px;
+	overflow: auto;
+	height: 100%;
+}
+#Menu2 {
+	width: 300px;
+	overflow: auto;
+	height: 100%;
+}
+.table_item {
+	width: 100%;
+	height: 40px;
+	display: flex;
+	justify-content: center;
+	border:  dotted 3px rgba(255,200,200,.6);
+	box-sizing: border-box;
+	z-index: 55;
+	position: relative;
+} 
+.selected_item {
+	width: 100%;
+	height: 40px;
+	display: flex;
+	justify-content: center;
+	border:  solid 3px rgba(255,200,200,.6);
+	background-color: rgba(255,200,200,.3);
+	box-sizing: border-box;
+	z-index: 55;
+	position: relative;
+} 
+.table_hover {
+	width: 100%;
+	height: 40px;
+	background-color: rgb(230,230,230);
+	border:transparent 3px;
+	box-sizing: border-box;
+	-webkit-transition: all .3s linear;
+    -moz-transition: all .3s linear;
+    -o-transition: all .3s linear;
+    -ms-transition: all .3s linear;
+	transition: all .3s linear;
+	z-index: 45;
+} 
+.label {
+	text-align: center;
+	vertical-align: middle;
+	font-weight: bold;
+	display: block;	
+	margin: 0 auto;
+	align-self: center;
+	cursor: pointer;
+	user-select: none;
+	z-index: 55;
+
+}
+body {
+	position: absolute;
+	height: 100%;
+	width: 100%;
+	font-family: Consolas, monaco, monospace;
+}
+
+
+
+</style>
+</html>
