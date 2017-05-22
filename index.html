@@ -8,11 +8,10 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
 </head>
 <body>
-<div id="log">
-</div>
-	<div class="content">
-		<div id="Menu">
-			<div class="menu_options" id="MenuInner">
+	<div id="log"></div>
+	<div class="menu_area pink_background">
+		<div class="menu_div">
+			<div class="menu_options_wrapper" id="MenuInner">
 				<div class="table_item">
 					<label class="label" id="option_1">Option 1</label>
 				</div>			
@@ -27,23 +26,22 @@
 				</div>
 			
 				<div class="menu_hover opacity_zero " id="MenuHover">
-					<div class="table_hover" id="HoverBox">
+					<div class="table_hover animate" id="HoverBox">
 						
 					</div>
 				</div>	
 			</div>
 		</div>
 	</div>
-	<div class="content2" id="content2">
+	<div class="menu_area lightblue_background" id="reactContent">
 	</div>
-</div>
 </body>
 
 
 <script type="text/babel">
 	class ReactListItem extends React.Component {
       	render() {
-      		const classes = (this.props.selected) ? "selected_item animate" : "table_item animate";
+      		const classes = (this.props.selected) ? "selected_item table_item animate" : "table_item animate";
       		return (
       			<div className={classes}>
 					<label className="label" id={this.props.id} >{this.props.option}</label>
@@ -54,13 +52,12 @@
     class ReactListHoverBox extends React.Component {
       	render() {
        		return (
-      			<div className="menu_hover animate table_hover" style={this.props.theStyle}>
+      			<div className="animate table_hover" style={this.props.theStyle}>
 				</div>	
       		);
       	}
     }
 
-    var names = ["Niklas", "Porscho", "Hank", "Bread", "Bool","Yuri","Morty"];
 
 
 	class ReactList extends React.Component{
@@ -69,10 +66,11 @@
 			super(props);
 		    this.state =  {
 		    	opacity: 0,
-		    	currentHeight:  0,
+		    	currentHeight:  -1,
 		    	disp: false,
 		    	selected:-1
 		    };
+		    this.listKeys = [];
 		}
 		setHeight(e) {
 			var parentOffset = $(ReactDOM.findDOMNode(this)).parent().offset(); 
@@ -109,6 +107,7 @@
 			this.setState({
 				selected: this.state.current
 			});	
+			this.props.submitMethod(this.props.items[this.listKeys[this.state.current]]);
 		}
 		componentDidUpdate(){
 		}
@@ -127,8 +126,9 @@
 
       		var listCount = 0;
       		var outsideThis = this;
-			var listItems = names.map(function(name) {
+			var listItems = Object.keys(this.props.items).map(function(name) {
 				const isSelected = (outsideThis.state.selected == listCount) ? true : false;
+				outsideThis.listKeys[listCount] = name;
 				listCount = 1 + listCount;
       			return <ReactListItem key={name.toString()} id={name.toString()} option={name} selected={isSelected}/>;
 			}
@@ -140,8 +140,8 @@
     			hoverBox= <div></div>;
     		}
           	return (
-	            <div id="Menu2" onMouseMove={this.mouseMoveEventHandler.bind(this)} onMouseEnter={this.mouseEnterEventHandler.bind(this)} onMouseLeave={this.mouseExitEventHandler.bind(this)} onClick={this.mouseClickEventHandler.bind(this)}>
-	              	<div className="menu_options">
+	            <div className="menu_div" onMouseMove={this.mouseMoveEventHandler.bind(this)} onMouseEnter={this.mouseEnterEventHandler.bind(this)} onMouseLeave={this.mouseExitEventHandler.bind(this)} onClick={this.mouseClickEventHandler.bind(this)}>
+	              	<div className="menu_options_wrapper">
 	              		<div className="menu_screen animate" style={screenStyle}></div>
 	              		{listItems}
 	              		<div>
@@ -154,11 +154,13 @@
       	}
   	}
 
-	var destination = document.querySelector("#content2");
+	var destination = document.querySelector("#reactContent");
+
+    var names = {"Niklas":"Niklas's Arguments", "Porscho":"Porschos's Arguments", "Hank":"Hank's Arguments", "Bread":"Breads's Arguments", "Yuri":"Yuri's Arguments"};
 
 	ReactDOM.render(
 		<div className="container">
-		    <ReactList/>
+			<ReactList items={names} submitMethod={wl}/>
 		</div>
 	, destination);
 </script>
@@ -192,7 +194,7 @@
 		}
 	});
 
-	$(".menu_options").click(function(){
+	$(".menu_options_wrapper").click(function(){
 		wl("click");
 	});
 
@@ -211,33 +213,30 @@ function wl(text) {
 
 <style type="text/css">
 	
-.content {
+.menu_area {
 	left: 40%;
 	position: relative;
-	top: 20%;
-	height: 70%;
+	height: 30%;
 	width:40%;
+}
+
+.lightblue_background {
 	background-color: pink;
-
-
 }
-.content2 {
-	left: 40%;
-	position: relative;
-	height: 70%;
-	width:40%;
+
+
+.pink_background {
 	background-color: lightblue;
-
-
 }
+
 #log {
 	position: absolute;
 	overflow-y: auto;
 	height: 500px;
-	width: 300px;
+	width: 30%;
 	background-color: lightgrey;
 }
-.menu_options {
+.menu_options_wrapper {
 	position: absolute;
 	width: inherit;
 	display: table-row;
@@ -252,10 +251,6 @@ function wl(text) {
 .menu_hover {
 	position: absolute;
 	width: inherit;
-	cursor: pointer;
-	pointer-events: none;
-	top:0;
-	z-index: 45;
 }
 .menu_screen {
 	background-color: rgb(230,230,230);
@@ -271,17 +266,7 @@ function wl(text) {
     -ms-transition: all .3s linear;
 	transition: all .3s linear;
 }
-
-#HoverBox {
-
-}
-
-#Menu {
-	width: 300px;
-	overflow: auto;
-	height: 100%;
-}
-#Menu2 {
+.menu_div {
 	width: 300px;
 	overflow: auto;
 	height: 100%;
@@ -297,15 +282,8 @@ function wl(text) {
 	position: relative;
 } 
 .selected_item {
-	width: 100%;
-	height: 40px;
-	display: flex;
-	justify-content: center;
 	border:  solid 3px rgba(255,200,200,.6);
 	background-color: rgba(255,200,200,.3);
-	box-sizing: border-box;
-	z-index: 55;
-	position: relative;
 } 
 .table_hover {
 	width: 100%;
@@ -313,12 +291,8 @@ function wl(text) {
 	background-color: rgb(230,230,230);
 	border:transparent 3px;
 	box-sizing: border-box;
-	-webkit-transition: all .3s linear;
-    -moz-transition: all .3s linear;
-    -o-transition: all .3s linear;
-    -ms-transition: all .3s linear;
-	transition: all .3s linear;
 	z-index: 45;
+	position: absolute;
 } 
 .label {
 	text-align: center;
@@ -330,13 +304,13 @@ function wl(text) {
 	cursor: pointer;
 	user-select: none;
 	z-index: 55;
-
 }
 body {
 	position: absolute;
 	height: 100%;
 	width: 100%;
 	font-family: Consolas, monaco, monospace;
+	margin: 0px;
 }
 
 
