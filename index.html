@@ -8,6 +8,13 @@
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.23/browser.min.js"></script>
 </head>
 <body>
+	<div>
+		<h2>React Menu</h2>
+		<p>
+			This showcases two menus that I built with JQuery (light-blue)
+			and with React (pink). The pink menu has the ability to call a function with different arguments for each items passed in as a dictioary (key=label, value= arguments). Notice that the box that appears when you hover over an element fades in on the element you hover on initially, not sliding for the elemnt you exited the menu on.
+		</p>
+	</div>
 	<div id="log"></div>
 	<div class="menu_area pink_background">
 		<div class="menu_div">
@@ -174,7 +181,6 @@
 		moveDirect = true;
 	}).mouseleave(function(){
 		$("#MenuHover").addClass("opacity_zero");
-		wl("here");
 	});
 
 	$( "#MenuInner" ).mousemove(function( e ) {
